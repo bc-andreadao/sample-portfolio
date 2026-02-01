@@ -1,0 +1,123 @@
+import Video from "../../components/Video";
+
+# SaaS Consent Management: Custom Catalyst Implementation
+
+The Consent Manager in the [Catalyst](https://developer.bigcommerce.com/docs/storefront/catalyst) features [c15t](https://c15t.com/) to provide a comprehensive solution for General Data Protection Regulation (GDPR), California Consumer Privacy Act (CCPA), and other privacy regulation compliance.
+
+In this simulation, we’ll first explain the basic features that c15t provides out of the box. We’ll then show what we’ve customized in Catalyst by incorporating parts of the Catalyst implementation into the demo. You can find the full Catalyst implementation in the `canary` branch.
+
+## Prerequisites
+
+Clone the [c15t-demo github repository](https://github.com/bc-andreadao/c15t-demo) and install dependencies.
+
+```bash
+git clone https://github.com/bc-andreadao/c15t-demo.git
+cd c15t-demo
+npm install
+```
+
+## What is c15t? 
+
+[C15t](https://c15t.com/) is an [open source framework](https://github.com/c15t/c15t) for managing user consent and privacy compliance in modern web apps. It’s designed for a great experience: native REACT components, easy-to-integrate tooling, and painless configuration. What’s more – the banner loads quickly, scripts that don’t match user preferences are automatically blocked, and it [integrates with Next.js apps](https://c15t.com/docs/frameworks/next/quickstart) like Catalyst.
+
+## Basic Usage
+
+Let’s look at the functionality that c15t provides out of the box. Start by following the steps below: 
+
+- Open the repository you cloned in the Prerequisites section. 
+
+- Check out the `main` branch. 
+
+On this branch, we’ve followed the [Quickstart Guide](https://c15t.com/docs/frameworks/next/quickstart) to install and configure c15t. In your `layout.tsx` file, you’ll see the JSX components that c15t provides. We’ve imported the consent banner and manager dialog component and wrapped it inside the `ConsentManagerProvider` wrapper, which manages global state for consent.
+
+Start your development server (`npm run dev`) and visit the app homepage. You should see a banner that offers to accept, reject, or customize cookie preferences.
+
+![c15t-consent-banner](/c15t/c15t-consent-banner.png)
+
+Click “Customize” in the banner to open the manager dialog. The dialog shows the consent categories that we input into the `ConsentManagerProvider` in the `layout.tsx` file. 
+
+![c15t-manager-dialog](/c15t/c15t-manager-dialog.png)
+
+After you choose your preferences, c15t will persist the consent. The c15t library provides different [options for storing user preferences](https://c15t.com/docs/frameworks/next/storing-consent/overview). At the moment, the demo stores preferences in the browser’s local storage, which is the `offline` mode available out of the box.
+
+Let’s check that consent gets stored. Click the “Functionality” category in the dialog and save the settings. If you open up the browser’s local storage, you should see the `c15t-consent` key with the saved preference. The banner and dialog also close.  
+
+<Video src={"/c15t/basic-usage.mp4"}></Video>
+
+To clear consent, you can clear the site data (which empties local storage) and refresh the page. The banner should re-appear.
+
+<Video src={"/c15t/basic-usage-2.mp4"}></Video>
+
+## Customized Components
+
+So far, we’ve used c15t components in their most basic form. But c15t also lets you customize your banner by bringing in your own components and using [theme keys](https://c15t.com/docs/frameworks/next/styling/overview) for styling.
+
+Check out the `ui-components` branch. Here, we’ve included VIBES components into our banner to style the button and checkbox and some theme keys for styling. The static text for the components uses a hook from the `next-intl` library, which we’ll explore in the next section.
+
+If you visit your homepage, you should see the following. 
+
+<Video src={"/c15t/ui-components.mp4"}></Video>
+
+Note that Catalyst imports these banner components out-of-the-box, but includes custom Tailwind configuration:
+
+<Video src={"/c15t/catalyst-c15t.mp4"}></Video>
+
+## Multilanguage Translations
+
+C15t supports [built-in i18n](https://c15t.com/docs/frameworks/next/internationalization) to translate the static text in its banner components. With this configuration, you would pass translations to the `translations` object in the `ConsentManagerProvider` wrapper in the `layout.tsx` file. 
+
+However, in Catalyst, we apply translations to our components through the [`next-intl` configuration](https://next-intl.dev/docs/getting-started/app-router) instead. In our components, the static text comes from the JSON files inside the `messages` folder. The `ConsentManager` key inside the JSON file contains the static strings for the consent manager components. The banner components we implement then reference the `ConsentManager` key from the translation files. 
+
+To check this out, make sure you’re still on the same `ui-components` branch and open the `/messages/en.json` file. Change the value of the `ConsentManager.CookieBanner.title` key. You should see the banner title in the component change:
+
+<Video src={"/c15t/translations.mp4"}></Video>
+
+The full `next-intl` implementation in Catalyst includes locale detection, translations for other languages, and other features. For supported languages, this allows you to change the locale from your language selector and see the appropriate translations: 
+
+<Video src={"/c15t/catalyst-c15t-multilang.mp4"}></Video>
+
+For more info, see the [Static Translations](https://developer.bigcommerce.com/docs/storefront/catalyst/features/localization/overview) overview in the Catalyst documentation.
+
+## Consent Storage
+
+So far, we’ve been storing consent preferences in browser local storage, an option that c15t provides out of the box. 
+
+However, in Catalyst, preferences are stored in browser cookies. In this custom implementation, we’ve added custom endpoint handlers to the `ConsentManagerProvider` configuration to show consent banners, set consent preferences, and verify consent status through cookies. With our implementation, you could read cookies on the server, not just the client. 
+
+To see this in action, check out the `consent-storage` branch. 
+
+Click “Customize” to open the manager dialog. Check the “Functionality” category and save the settings. If you open up the browser’s cookie storage, you should see the cookie named `c15t-consent` with the saved preference. 
+
+<Video src={"/c15t/consent-storage.mp4"}></Video>
+
+As before, you can clear the site data to delete the cookies. When you refresh the page, the banner should re-appear.
+
+## Script Loader
+
+C15t provides a [script loader](https://c15t.com/docs/frameworks/next/script-loader) feature that lets you load scripts based on consent. To use this feature, pass your scripts as a prop into a `ClientSideOptionsProvider` wrapper. C15t will load the scripts under the category that matches the user preference (in addition to scripts under the `necessary` consent category). 
+
+To see the script loader in action, check out the `script-loader` branch. On this branch, we’ve used sample script data with the `ClientSideOptionsProvider` wrapper we configured. We’ve included a sample script for each consent category, which logs the name of its consent category into the browser console. 
+
+Click “Customize” to open the manager dialog. Check the “Functionality” category and save the settings. If you open up the browser console, you should see that the scripts under the “functionality” and “necessary” category were executed. If you delete the site data, only the necessary script executes:  
+
+<Video src={"/c15t/script-loader.mp4"}></Video>
+
+In our demo code, the `script-data.ts` file contains sample data that you might receive when you make a fetch call to the [Storefront GraphQL API](https://developer.bigcommerce.com/docs/storefront/graphql) for script data. Our `scriptsTransformer.ts` file then returns the sample script data in the correct format.
+
+This is similar to the Catalyst implementation, but note that the consent manager in a Catalyst app is fully integrated with BigCommerce’s [Script Manager](https://support.bigcommerce.com/s/article/Using-Script-Manager?language=en_US). In Catalyst, your storefront scripts are first fetched through the [Storefront GraphQL API](https://developer.bigcommerce.com/docs/storefront/graphql). The [`scriptsTransformer.ts` file](https://github.com/bigcommerce/catalyst/blob/canary/core/data-transformers/scripts-transformer.ts) then extracts and transforms the GraphQL response data into the format that c15t requires.
+
+In Catalyst, there also is feature parity with Stencil in how scripts are categorized and loaded. The `scriptsTransformer.ts` file maps BigCommerce consent categories to the categories that c15t requires so that:
+
+- If the user has not provided any consent preference, Catalyst only loads `ESSENTIAL` and `UNKNOWN` scripts.
+
+- If the user has "Accepted All" consent categories, all scripts load
+
+- If the user has "Rejected All" consent categories, only `ESSENTIAL` and `UNKNOWN` scripts load.
+
+## What’s Next?
+
+Check out the full Catalyst implementation of the consent manager on the `canary` branch! You’ll need to [enable the cookie consent tracking](https://developer.bigcommerce.com/docs/storefront/catalyst/reference/security#enabling-cookie-consent-tracking) in your Control Panel to be able to see the banner on your Catalyst storefront. 
+
+For more information, check out the [Catalyst Consent Management](https://developer.bigcommerce.com/docs/storefront/catalyst/reference/security#consent-management) documentation. 
+
+Learn more about c15t by watching Christopher Burns’s talk, [Why Your Consent Banner Should be in Your Bundle](https://nextjs.org/conf/session/why-your-consent-banner-should-be-in-your-bundle), from this year’s Next.js Conf, checking out the [c15t docs](https://c15t.com/docs/frameworks/next/quickstart), and joining the [support channels they offer](https://github.com/c15t/c15t?tab=readme-ov-file#support). 
