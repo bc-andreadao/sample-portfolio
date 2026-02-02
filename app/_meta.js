@@ -1,5 +1,5 @@
 export default {
-  index: "About",
+  index: "Sample Portfolio About",
 
   "---": {
     title: "Labs and Simulations",
@@ -9,4 +9,5 @@ export default {
   saas: "Storefront Localization",
   suspense: "Suspense and Streaming",
   consent: "Consent Management",
+  proxy: "🎬 API Proxy Lab (YouTube) ↗",
 };
