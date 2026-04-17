@@ -1,8 +1,9 @@
 import Video from "../../components/Video";
 
-# SaaS Consent Management: Custom Catalyst Implementation
+# SaaS Consent Management -
+# Custom Catalyst Implementation
 
-The Consent Manager in the [Catalyst](https://developer.bigcommerce.com/docs/storefront/catalyst) features [c15t](https://c15t.com/) to provide a comprehensive solution for General Data Protection Regulation (GDPR), California Consumer Privacy Act (CCPA), and other privacy regulation compliance.
+The Consent Manager in the [Catalyst](https://docs.bigcommerce.com/developer/docs/storefront/catalyst/overview) features [c15t](https://c15t.com/) to provide a comprehensive solution for General Data Protection Regulation (GDPR), California Consumer Privacy Act (CCPA), and other privacy regulation compliance.
 
 In this simulation, we’ll first explain the basic features that c15t provides out of the box. We’ll then show what we’ve customized in Catalyst by incorporating parts of the Catalyst implementation into the demo. You can find the full Catalyst implementation in the `canary` branch.
 
@@ -76,7 +77,7 @@ The full `next-intl` implementation in Catalyst includes locale detection, trans
 
 <Video src={"/c15t/catalyst-c15t-multilang.mp4"}></Video>
 
-For more info, see the [Static Translations](https://developer.bigcommerce.com/docs/storefront/catalyst/features/localization/overview) overview in the Catalyst documentation.
+For more info, see the [Static Translations](https://docs.bigcommerce.com/developer/docs/storefront/catalyst/features/localization/static-translations) overview in the Catalyst documentation.
 
 ## Consent Storage
 
@@ -102,9 +103,9 @@ Click “Customize” to open the manager dialog. Check the “Functionality” 
 
 <Video src={"/c15t/script-loader.mp4"}></Video>
 
-In our demo code, the `script-data.ts` file contains sample data that you might receive when you make a fetch call to the [Storefront GraphQL API](https://developer.bigcommerce.com/docs/storefront/graphql) for script data. Our `scriptsTransformer.ts` file then returns the sample script data in the correct format.
+In our demo code, the `script-data.ts` file contains sample data that you might receive when you make a fetch call to the [Storefront GraphQL API](https://docs.bigcommerce.com/developer/docs/storefront/guides/graphql-storefront-api/overview) for script data. Our `scriptsTransformer.ts` file then returns the sample script data in the correct format.
 
-This is similar to the Catalyst implementation, but note that the consent manager in a Catalyst app is fully integrated with BigCommerce’s [Script Manager](https://support.bigcommerce.com/s/article/Using-Script-Manager?language=en_US). In Catalyst, your storefront scripts are first fetched through the [Storefront GraphQL API](https://developer.bigcommerce.com/docs/storefront/graphql). The [`scriptsTransformer.ts` file](https://github.com/bigcommerce/catalyst/blob/canary/core/data-transformers/scripts-transformer.ts) then extracts and transforms the GraphQL response data into the format that c15t requires.
+This is similar to the Catalyst implementation, but note that the consent manager in a Catalyst app is fully integrated with BigCommerce’s [Script Manager](https://support.bigcommerce.com/s/article/Using-Script-Manager?language=en_US). In Catalyst, your storefront scripts are first fetched through the [Storefront GraphQL API](https://docs.bigcommerce.com/developer/docs/storefront/guides/graphql-storefront-api/overview). The [`scriptsTransformer.ts` file](https://github.com/bigcommerce/catalyst/blob/canary/core/data-transformers/scripts-transformer.ts) then extracts and transforms the GraphQL response data into the format that c15t requires.
 
 In Catalyst, there also is feature parity with Stencil in how scripts are categorized and loaded. The `scriptsTransformer.ts` file maps BigCommerce consent categories to the categories that c15t requires so that:
 
@@ -116,8 +117,8 @@ In Catalyst, there also is feature parity with Stencil in how scripts are catego
 
 ## What’s Next?
 
-Check out the full Catalyst implementation of the consent manager on the `canary` branch! You’ll need to [enable the cookie consent tracking](https://developer.bigcommerce.com/docs/storefront/catalyst/reference/security#enabling-cookie-consent-tracking) in your Control Panel to be able to see the banner on your Catalyst storefront. 
+Check out the full Catalyst implementation of the consent manager on the `canary` branch! You’ll need to [enable the cookie consent tracking](https://docs.bigcommerce.com/developer/docs/storefront/catalyst/reference/security#enabling-cookie-consent-tracking) in your Control Panel to be able to see the banner on your Catalyst storefront. 
 
-For more information, check out the [Catalyst Consent Management](https://developer.bigcommerce.com/docs/storefront/catalyst/reference/security#consent-management) documentation. 
+For more information, check out the [Catalyst Consent Management](https://docs.bigcommerce.com/developer/docs/storefront/catalyst/reference/security#consent-management) documentation. 
 
 Learn more about c15t by watching Christopher Burns’s talk, [Why Your Consent Banner Should be in Your Bundle](https://nextjs.org/conf/session/why-your-consent-banner-should-be-in-your-bundle), from this year’s Next.js Conf, checking out the [c15t docs](https://c15t.com/docs/frameworks/next/quickstart), and joining the [support channels they offer](https://github.com/c15t/c15t?tab=readme-ov-file#support). 

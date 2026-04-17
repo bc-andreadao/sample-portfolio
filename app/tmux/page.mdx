@@ -1,0 +1,101 @@
+import Video from "../../components/Video";
+
+# Stop Juggling Terminals -
+# Run Your Laravel React App  with Tmux 
+
+Earlier this year, the BigCommerce Developer Relations team had an incredible opportunity to attend the [Laracon Conference 2025](https://laracon.us/) in Denver. One practical takeaway from the conference we saw that will help you when you’re building your BigCommerce [Laravel React app](https://github.com/bigcommerce/laravel-react-sample-app) is how [Tmux](https://github.com/tmux/tmux) can simplify your development workflow.
+
+Let’s say on a daily basis, you want to run your development server, watch logs in real time, and keep a terminal open for Git commands. Normally, that’s three terminals to manage. With Tmux, you can split one terminal into multiple panes and continue running processes until you explicitly end them. Detach, switch tasks, and return later -- your sessions are still running.
+
+Here's the best part: you can do it all in one terminal window -- and with this [script](https://github.com/bigcommerce/laravel-react-sample-app/pull/48/files), in one command.
+
+<br />
+<Video src={"/tmux/final-Tmux.mp4"}></Video>
+
+This blog was inspired by Alex Six’s presentation, [Turbocharging Your Laravel Development with the Terminal](https://www.youtube.com/watch?v=cbn3y_f8eDM), presented at Laracon.
+
+Read on to see how you can use Tmux to help your Laravel React app workflow!
+
+
+## Prerequisites
+
+1. Install the [Laravel React App](https://github.com/bigcommerce/laravel-react-sample-app) and its dependencies.
+2. Install Tmux. On a Mac, you can install [Tmux](https://github.com/tmux/tmux) with Homebrew by running:
+   
+   ```bash
+   brew install tmux
+   ```
+
+3. Install the [Tmux starter](https://github.com/alexandersix/tmux-starter) to help get you started with Tmux. After you fork and clone the starter, you may need to [update your `.tmux.conf`](https://github.com/bc-andreadao/tmux-starter/blob/main/.tmux.conf#L32) file with a higher escape time for when you open sessions later in this tutorial.
+
+## Starting your dev environment
+
+Let’s compare the workflow for starting the development server and viewing logs in real time both with and without Tmux. The Laravel React app uses the Vite development server and stores logs in the `storage/logs/laravel.log` file. In each case, we will start the dev server with `npm run dev` and view logs with `tail -f storage/logs/laravel.log`. 
+
+## Without Tmux 
+
+Without Tmux, you could open three terminals and run each of those processes in a separate terminal. 
+
+On a Mac, you might run something like: 
+
+- `Ctrl` + `Shift` + `5` (open a new terminal) 
+- Run `npm run dev` 
+- `Ctrl` + `Shift` + `5` 
+- Run `tail -f storage/logs/laravel.log`
+
+<br />
+<Video src={"/tmux/Tmux-1.mp4"}></Video>
+
+But remember, each terminal runs a temporary process that can’t be easily recovered if you end it. That’s where the benefit of Tmux comes in. 
+
+## With Tmux 
+
+With Tmux, you can create sessions for your terminal processes. You can exit and return to the sessions while they run continuously in the background, letting you flexibly work on other tasks. You can do this all in one terminal in Tmux, since terminal windows can be split into panes. First, create a session named laravel-dev by running `tmux new-session -s laravel-dev`. You can then split the terminal into panes and run processes in each pane.
+
+On a Mac, you might run something like: 
+
+- `Ctrl` + `Shift` + `\` (split horizontally) 
+- Run `npm run dev`
+- Run `Ctrl` + `Shift` + `-` (split vertically) 
+- Run `tail -f storage/logs/laravel.log` 
+
+<br />
+<Video src={"/tmux/Tmux-2.mp4"}></Video>
+
+To exit your session, run `tmux detach-client`. To see saved sessions, run `tmux list-sessions`. To return to the session, run `tmux attach -t laravel-dev`. Notice how the processes are still running. 
+
+<br />
+<Video src={"/tmux/Tmux-3.mp4"}></Video>
+
+Note that if you are already inside a Tmux session, you need to run `tmux switch-client -t laravel-dev` instead. You can't run the `attach` command if you are already inside a session. 
+
+So far, you’ve seen the benefit of using Tmux sessions. But you have a lot of commands to remember for creating and returning to the session. What if you could do all of this with one command instead? 
+
+## Tmux script
+
+TL;DR With the [Tmux script](https://github.com/bigcommerce/laravel-react-sample-app/pull/48/files), you can use a single command to create and return to the session it creates. The command works whether you are inside or outside a Tmux session:
+
+```bash
+.tmux-dev.sh 
+```
+
+First, add the script to the root of your project. Then run `tmux kill-server` to delete the "laravel-dev" session and start fresh. 
+
+Go ahead and run `./tmux-dev.sh` from the terminal in the project to execute the script. This will create the session for you, called "laravel-dev" since you don’t already have a session with that name.
+
+<br />
+<Video src={"/tmux/Tmux-4.mp4"}></Video>
+
+You can use the script to reopen the same `laravel-dev` session after you detach from the session
+
+<br />
+<Video src={"/tmux/Tmux-5.mp4"}></Video>
+
+
+You can also switch to the "laravel-dev" session if you run the script while you’re already in another Tmux session. The video shows us switching to our "laravel-dev" session from another session named "demo-session":
+
+<br />
+<Video src={"/tmux/Tmux-6.mp4"}></Video>
+
+
+NOTE: The Tmux script creates 3 panes and runs the development server and the real time Laravel logs. If you plan on running different processes, you can still benefit from using the script. After you create the session, Tmux saves any changes to the processes you run in the session.
